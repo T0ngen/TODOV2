@@ -18,4 +18,6 @@ func (d *Db) AddTaskToDb(task mappers.NewTask) (int, error) {
 		return 0, err
 	}
 	return int(id), nil
+
+	
 }

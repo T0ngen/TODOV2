@@ -27,8 +27,8 @@ func main() {
 	
 
 
-
-	router.GET("/", FileServer)
+	
+	
 	
     api.RegisterRouter(router, validate, db)
 	
@@ -41,9 +41,4 @@ func main() {
 	
 }
 
-const webPath = "./web/"
-
-func FileServer(c *gin.Context) {
-	c.File(webPath + c.Request.URL.Path)
-} 
 

@@ -3,8 +3,9 @@ package api
 import (
 	"net/http"
 	"time"
-	"todov2/pkg/api/mappers"
+	"todov2/pkg/common/db/models"
 	"todov2/pkg/common/util/ndate"
+	
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
@@ -12,22 +13,11 @@ import (
 )
 
 
-const expectedLayout = "20060102"
 
-func genLog(err error, funcName, file string ) logrus.Fields {
-  
-	return logrus.Fields{
-	  "Error":            err,
-	  "File":             file,
-	  "FromFunction":     funcName,
-	}
-  
-  }
-
-
-func (h *handler) AddTask (c *gin.Context) {
-	var requestBody mappers.NewTask
+func (h *handler) UpdateTaskById(c *gin.Context){
 	nowParse := time.Now().Format(expectedLayout)
+	var requestBody models.Task
+
 	{
 		if err := c.ShouldBindJSON(&requestBody); err != nil {
 			logrus.WithFields(genLog(err, "ShouldBindJSON",
@@ -38,6 +28,8 @@ func (h *handler) AddTask (c *gin.Context) {
 				return
 		}
 	}
+
+	
 
 	{
 		err := h.Validator.Struct(requestBody)
@@ -107,18 +99,28 @@ func (h *handler) AddTask (c *gin.Context) {
 		}
 	}
 	
-
-	id, err := h.DB.AddTaskToDb(requestBody)
+	task, err := h.DB.GetTaskByID(requestBody.Id)
 	if err != nil {
-		logrus.WithFields(genLog(err, "AddTask",
-		"addTaskHandler")).Errorf("Error adding task to db")
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error adding task to db",
+			"error": "Unable to get task",
+		})
+		return
+	}
+	nilTask := models.Task{}
+	if task == nilTask{
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Unable to get task",
+		})
+	}
+
+	err = h.DB.UpdateTaskById(requestBody)
+	
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Unable to update task",
 		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"id": id,
 	})
-	
 }
