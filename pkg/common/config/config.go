@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Port      string
 	DbPath string
+	Password string
 }
 
 func (c *Config) InitConfig() (err error) {
@@ -26,6 +27,7 @@ func (c *Config) InitConfig() (err error) {
 	
 	c.Port = viper.GetString("TODO_PORT")
 	c.DbPath = viper.GetString("TODO_DBFILE")
+	c.Password = viper.GetString("TODO_PASSWORD")
 	return nil
 
 }

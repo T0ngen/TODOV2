@@ -30,7 +30,7 @@ func main() {
 	
 	
 	
-    api.RegisterRouter(router, validate, db)
+    api.RegisterRouter(router, validate, db, conf)
 	
 
 	
